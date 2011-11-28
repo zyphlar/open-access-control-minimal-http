@@ -155,8 +155,8 @@ boolean privmodeEnabled = false;                               // Switch for ena
 // Enter a MAC address and IP address for your controller below.
 // The IP address will be dependent on your local network:
 byte mac[] = {  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-byte ip[] = { 172,22,110,177 };
-byte server[] = { 172,22,110,15 }; // hsl-access
+byte ip[] = { 10,1,1,2 };
+byte server[] = { 10,1,1,1 }; // hsl-access
 
 // Initialize the Ethernet client library
 // with the IP address and port of the server 
@@ -259,6 +259,10 @@ void setup(){           // Runs once at Arduino boot-up
                                                // Also checks relays
 
 
+  // if there are incoming bytes available 
+  // from the server, read them and print them:
+  String httpresponse = "";
+  String username = "";
 }
 void loop()                                     // Main branch, runs over and over again
 {                         
@@ -290,12 +294,11 @@ void loop()                                     // Main branch, runs over and ov
      }
      
      wiegand26.initReaderOne();                     // Reset for next tag scan  
+     
+     httpresponse = "";
+     username = "";
   }
 
-  // if there are incoming bytes available 
-  // from the server, read them and print them:
-  String httpresponse = "";
-  String username = "";
   
   while (client.available()) {
     httpresponse += (char)client.read();
@@ -303,12 +306,15 @@ void loop()                                     // Main branch, runs over and ov
   
   if(httpresponse.length()>0) { 
     Serial.println("Response: ");
-    int c = httpresponse.indexOf('$');
+    int c = httpresponse.indexOf('AUTH:');
     
     Serial.println(httpresponse.substring(c+1));
 
     username = httpresponse.substring(c+1);
     httpresponse = "";
+    
+    Serial.print("User: ");
+    Serial.println(username);
     
     Serial.println("End Response");
   }
