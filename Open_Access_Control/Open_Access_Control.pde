@@ -64,7 +64,7 @@ byte reader1Pins[]={2,3};               // Reader 1 pins
 const byte relayPins[]= {6,7,8,9};            // Relay output pins
 
 // statics
-#define RELAYDELAY 18000                  // How long to open door lock once access is granted. (1000 = 1sec)
+#define RELAYDELAY 1800000                  // How long to open door lock once access is granted. (1000 = 1sec)
 #define RELAYPIN1 relayPins[0]           // Define the pin for electrified door 1 hardware
 #define RELAYPIN2 relayPins[2]           // Define the pin for electrified door 2 hardware
 
@@ -216,17 +216,21 @@ void loop()                                     // Main branch, runs over and ov
   //////////////////////////  
   
   // check timer -- if expired, remove authorization
-  long currentTime = millis() - relay1timer;
-  if(currentTime >= RELAYDELAY) {
-    authorized = false;
-  }
-  
-  long remaining = (RELAYDELAY - currentTime) / 1000;
-  long secRemaining = (RELAYDELAY - currentTime) / 1000 % 60;
-  long minRemaining = (RELAYDELAY - currentTime) / 1000 / 60 % 60;
-  long hrsRemaining = (RELAYDELAY - currentTime) / 1000 / 60 / 60;
   
   if(authorized && relay1high) {
+    // calculate current time elapsed
+    long currentTime = millis() - relay1timer;
+    // if time entirely elapsed, deauthorize.
+    if(currentTime >= RELAYDELAY) {
+      authorized = false;
+    }
+    
+    // calculate for display
+    long remaining = (RELAYDELAY - currentTime) / 1000;
+    long secRemaining = (RELAYDELAY - currentTime) / 1000 % 60;
+    long minRemaining = (RELAYDELAY - currentTime) / 1000 / 60 % 60;
+    long hrsRemaining = (RELAYDELAY - currentTime) / 1000 / 60 / 60;
+
     // display timer & username
     Serial.print(hrsRemaining);
     Serial.print(":");
