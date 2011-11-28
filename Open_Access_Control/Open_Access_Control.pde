@@ -1,10 +1,17 @@
 /*
- * Open Source RFID Access Controller
+ * Open Source RFID Access Controller - MINIMAL HTTP EDITION
  *
- * 4/3/2011 v1.32
- * Last build test with Arduino v00.21
+ * 11/27/2011 v0.01
+ * Last build test with Arduino v00.22
+ * 
+ * Based on Open Source RFID Access Controller code by:
  * Arclight - arclight@23.org
  * Danozano - danozano@gmail.com
+ * See: http://code.google.com/p/open-access-control/
+ *
+ * Minimal HTTP Edition by:
+ * Will Bradley - bradley.will@gmail.com
+ * See: https://github.com/zyphlar/open-access-control-minimal-http
  *
  * Notice: This is free software and is probably buggy. Use it at
  * at your own peril.  Use of this software may result in your
@@ -12,12 +19,6 @@
  * high seas pirates. No warranties are expressed on implied.
  * You are warned.
  *
- *
- * For latest downloads, including Eagle CAD files for the hardware, check out
- * http://code.google.com/p/open-access-control/downloads/list
- *
- * Latest update moves strings to PROGMEM to free up memory and adds a 
- * console password feature.
  * 
  *
  * This program interfaces the Arduino to RFID, PIN pad and all
@@ -25,41 +26,24 @@
  * Protocol. It is recommended that the keypad inputs be
  * opto-isolated in case a malicious user shorts out the 
  * input device.
- * Outputs go to a Darlington relay driver array for door hardware/etc control.
- * Analog inputs are used for alarm sensor monitoring.  These should be
- * isolated as well, since many sensors use +12V. Note that resistors of
- * different values can be used on each zone to detect shorting of the sensor
- * or wiring.
- *
- * Version 1.00+ of the hardware implements these features and uses the following pin 
- * assignments on a standard Arduino Duemilanova or Uno:
+ * Outputs go to relays for door hardware/etc control.
  *
  * Relay outpus on digital pins 6,7,8,9
- * DS1307 Real Time Clock (I2C):A4 (SDA), A5 (SCL)
- * Analog pins (for alarm):A0,A1,A2,A3 
  * Reader 1: pins 2,3
- * Reader 2: pins 4,5
- * Ethernet: pins 10,11,12,13 (Not connected to the board, reserved for the Ethernet shield)
+ * Ethernet: pins 10,11,12,13 (reserved for the Ethernet shield)
  *
  * Quickstart tips: 
- * Set the console password(PRIVPASSWORD) value to a numeric DEC or HEX value.
- * Define the static user list by swiping a tag and copying the value received into the #define values shown below 
  * Compile and upload the code, then log in via serial console at 57600,8,N,1
  *
  */
 
-#include <Wire.h>         // Needed for I2C Connection to the DS1307 date/time chip
 #include <EEPROM.h>       // Needed for saving to non-voilatile memory on the Arduino.
-#include <avr/pgmspace.h> // Allows data to be stored in FLASH instead of RAM
 
-
-#include <Ethernet.h>   // Ethernet stuff, comment out if not used.
+#include <Ethernet.h>
 #include <SPI.h>          
 #include <Server.h>
 #include <Client.h>
 
-
-#include <DS1307.h>       // DS1307 RTC Clock/Date/Time chip library
 #include <WIEGAND26.h>    // Wiegand 26 reader format libary
 #include <PCATTACH.h>     // Pcint.h implementation, allows for >2 software interupts.
 
