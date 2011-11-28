@@ -28,9 +28,10 @@
  * input device.
  * Outputs go to relays for door hardware/etc control.
  *
- * Relay outputs on digital pins 6,7,8,9
+ * Relay outputs on digital pins 6,7,8,9 //TODO: fix this conflict -WB
  * Reader 1: pins 2,3
  * Ethernet: pins 10,11,12,13 (reserved for the Ethernet shield)
+ * LCD: pins 7, 6, 5, 4, 3, 2
  *
  * Quickstart tips: 
  * Compile and upload the code, then log in via serial console at 57600,8,N,1
@@ -51,6 +52,7 @@
 #include <WIEGAND26.h>    // Wiegand 26 reader format libary
 #include <PCATTACH.h>     // Pcint.h implementation, allows for >2 software interupts.
 
+#include <LiquidCrystal.h>
 
 // Create an instance of the various C++ libraries we are using.
 WIEGAND26 wiegand26;  // Wiegand26 (RFID reader serial protocol) library
@@ -84,6 +86,10 @@ byte server[] = { 10,1,1,1 }; // hsl-access
 // with the IP address and port of the server 
 // that you want to connect to (port 80 is default for HTTP):
 Client client(server, 80);
+
+
+// initialize the library with the numbers of the interface pins
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
 // strings for storing results from web server
 String httpresponse = "";
@@ -119,10 +125,20 @@ void setup(){           // Runs once at Arduino boot-up
   // start the Ethernet connection:
   Ethernet.begin(mac, ip);
   
+  // set up the LCD's number of columns and rows: 
+  lcd.begin(10, 2);
+  // Print a message to the LCD.
+  lcd.print("hI");
 
 }
 void loop()                                     // Main branch, runs over and over again
 { 
+  // set the cursor to column 0, line 1
+  // (note: line 1 is the second row, since counting begins with 0):
+  lcd.setCursor(0, 1);
+  // print the number of seconds since reset:
+  lcd.print(millis()/1000);
+  
   //////////////////////////  
   // Reader input/authentication section  
   //////////////////////////
