@@ -51,8 +51,7 @@
 
 #include <WIEGAND26.h>    // Wiegand 26 reader format libary
 #include <PCATTACH.h>     // Pcint.h implementation, allows for >2 software interupts.
-
-#include <LiquidCrystal.h>
+#include <ShiftLCD.h>     // LCD via shift register
 
 // Create an instance of the various C++ libraries we are using.
 WIEGAND26 wiegand26;  // Wiegand26 (RFID reader serial protocol) library
@@ -64,7 +63,10 @@ PCATTACH pcattach;    // Software interrupt library
 
 // pin assignments
 byte reader1Pins[]={2,3};               // Reader 1 pins
-const byte relayPins[]= {6,7,8,9};            // Relay output pins
+const byte relayPins[]= {6,7,8,9};            // Relay output pins -- fix conflict with lcd
+
+// initialize the ShiftLCD library with the numbers of the interface pins
+ShiftLCD lcd(4, 6, 5);
 
 // statics
 #define RELAYDELAY 1800000                  // How long to open door lock once access is granted. (1000 = 1sec)
@@ -86,10 +88,6 @@ byte server[] = { 10,1,1,1 }; // hsl-access
 // with the IP address and port of the server 
 // that you want to connect to (port 80 is default for HTTP):
 Client client(server, 80);
-
-
-// initialize the library with the numbers of the interface pins
-LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
 // strings for storing results from web server
 String httpresponse = "";
@@ -125,19 +123,14 @@ void setup(){           // Runs once at Arduino boot-up
   // start the Ethernet connection:
   Ethernet.begin(mac, ip);
   
-  // set up the LCD's number of columns and rows: 
-  lcd.begin(10, 2);
+  // set up the LCD's number of rows and columns: 
+  lcd.begin(16, 2);
   // Print a message to the LCD.
-  lcd.print("hI");
+  lcd.print("Hello");
 
 }
 void loop()                                     // Main branch, runs over and over again
 { 
-  // set the cursor to column 0, line 1
-  // (note: line 1 is the second row, since counting begins with 0):
-  lcd.setCursor(0, 1);
-  // print the number of seconds since reset:
-  lcd.print(millis()/1000);
   
   //////////////////////////  
   // Reader input/authentication section  
@@ -249,31 +242,51 @@ void loop()                                     // Main branch, runs over and ov
     long hrsRemaining = (RELAYDELAY - currentTime) / 1000 / 60 / 60;
 
     // display timer & username
-    Serial.print(hrsRemaining);
-    Serial.print(":");
-    Serial.print(minRemaining);
-    Serial.print(":");
-    Serial.print(secRemaining);
-    Serial.print(" remaining, ");
-    Serial.println(username);
+    lcd.setCursor(0, 0);    
+    lcd.print(username);
+    lcd.setCursor(0, 1);
+    lcd.print(hrsRemaining);
+    lcd.print(":");
+    lcd.print(minRemaining);
+    lcd.print(":");
+    lcd.print(secRemaining);
+    lcd.print(" remain");
   }
   if(!authorized && relay1high) {
+    lcd.clear();
+    lcd.setCursor(0, 0);  
+    lcd.print("Turning off.");
+    delay(500);    
+    lcd.clear();    
+    
     // not authorized -- turn off relay
     relayLow(1);
   }
   if(authorized && !relay1high) {
+    lcd.clear();
+    lcd.setCursor(0, 0);  
+    lcd.print("Turning on.");
+    delay(500);
+    lcd.clear();
+
     // authorized -- turn on relay
     relayHigh(1);
   }
   if(!authorized && !relay1high) {
     // display login message
-    Serial.println("Please login.");
+    lcd.setCursor(0, 0);  
+    lcd.print("Please login.");
   }
   
 } // End of loop()
 
-
-
+void lcdprint(int x, int y, char text) {
+  // set the cursor to column 0, line 1
+  // (note: line 1 is the second row, since counting begins with 0):
+  lcd.setCursor(x, y);
+  // print the number of seconds since reset:
+  lcd.print(text);
+}
 
 /* Access System Functions - Modify these as needed for your application. 
  These function control lock/unlock and user lookup.
