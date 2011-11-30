@@ -63,15 +63,15 @@ PCATTACH pcattach;    // Software interrupt library
 
 // pin assignments
 byte reader1Pins[]={2,3};               // Reader 1 pins
-const byte relayPins[]= {6,7,8,9};            // Relay output pins -- fix conflict with lcd
+byte RELAYPIN1 = 7;
+byte extendButton = A5;
+byte logoutButton = A4;
 
 // initialize the ShiftLCD library with the numbers of the interface pins
 ShiftLCD lcd(4, 6, 5);
 
 // statics
 #define RELAYDELAY 1800000                  // How long to open door lock once access is granted. (1000 = 1sec)
-#define RELAYPIN1 relayPins[0]           // Define the pin for electrified door 1 hardware
-#define RELAYPIN2 relayPins[2]           // Define the pin for electrified door 2 hardware
 
 // Serial terminal buffer (needs to be global)
 char inString[40]={0};                                         // Size of command buffer (<=128 for Arduino)
@@ -113,14 +113,14 @@ void setup(){           // Runs once at Arduino boot-up
   wiegand26.initReaderOne(); //Set up Reader 1 and clear buffers.
 
   // Initialize button input
-  pinMode(A5, INPUT);
-  digitalWrite(A5, HIGH);
+  pinMode(extendButton, INPUT);
+  digitalWrite(extendButton, HIGH);
+  pinMode(logoutButton, INPUT);
+  digitalWrite(logoutButton, HIGH);
 
   //Initialize output relays
-  for(byte i=0; i<4; i++){        
-    pinMode(relayPins[i], OUTPUT);                                                      
-    digitalWrite(relayPins[i], LOW);                  // Sets the relay outputs to LOW (relays off)
-  }
+  pinMode(RELAYPIN1, OUTPUT);                                                      
+  digitalWrite(RELAYPIN1, LOW);                  // Sets the relay outputs to LOW (relays off)
 
   Serial.begin(57600);	               	       // Set up Serial output at 8,N,1,57600bps
   
@@ -143,12 +143,20 @@ void loop()                                     // Main branch, runs over and ov
   // check timer -- if expired, remove authorization
   
   if(authorized && relay1high) {
-    
+   
     // Detect button push
-    lcd.setCursor(12,0);
-    lcd.print(analogRead(A5));
+    lcd.setCursor(6,0);
+    lcd.print(analogRead(logoutButton));
     lcd.print("  ");
-    if (analogRead(A5) < 50) {  
+    if (analogRead(logoutButton) < 50) {  
+      authorized = false;
+    }
+    
+       // Detect extend button push
+    lcd.setCursor(12,0);
+    lcd.print(analogRead(extendButton));
+    lcd.print("  ");
+    if (analogRead(extendButton) < 50) {  
       relay1timer = millis(); 
     }
     
@@ -319,16 +327,11 @@ relay1timer = millis();
 byte dp=1;
   if(input == 1) {
     dp=RELAYPIN1; }
-  if(input == 2) {
-    dp=RELAYPIN2; }
-  
+    
   digitalWrite(dp, HIGH);
   
   if (input == 1) {
     relay1high = true;
-  }
-  if (input == 2) {
-    relay2high = true; 
   }
   
   Serial.print("Relay ");
@@ -341,16 +344,11 @@ void relayLow(int input) {          //Send an unlock signal to the door and flas
 byte dp=1;
   if(input == 1) {
     dp=RELAYPIN1; }
-  if(input == 2) {
-    dp=RELAYPIN2; }
 
   digitalWrite(dp, LOW);
 
   if (input == 1) {
     relay1high = false;
-  }
-  if (input == 2) {
-    relay2high = false; 
   }
 
   Serial.print("Relay ");
