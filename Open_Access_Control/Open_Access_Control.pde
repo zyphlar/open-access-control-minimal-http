@@ -108,9 +108,13 @@ void setup(){           // Runs once at Arduino boot-up
    */
   pcattach.PCattachInterrupt(reader1Pins[0], callReader1Zero, CHANGE); 
   pcattach.PCattachInterrupt(reader1Pins[1], callReader1One,  CHANGE);  
-
+  
   //Clear and initialize readers
   wiegand26.initReaderOne(); //Set up Reader 1 and clear buffers.
+
+  // Initialize button input
+  pinMode(A5, INPUT);
+  digitalWrite(A5, HIGH);
 
   //Initialize output relays
   for(byte i=0; i<4; i++){        
@@ -132,95 +136,6 @@ void setup(){           // Runs once at Arduino boot-up
 void loop()                                     // Main branch, runs over and over again
 { 
   
-  //////////////////////////  
-  // Reader input/authentication section  
-  //////////////////////////
-  if(reader1Count >= 26)
-  {                           //  When tag presented to reader1 (No keypad on this reader)
-
-  
-     Serial.println("connecting...");
-  
-     // if you get a connection, report back via serial:
-     if (client.connect())
-     {
-        Serial.println("connected");
-        
-        Serial.print("GET /~access/access?device=laser&id=");   
-        Serial.print(reader1, HEX);
-        Serial.println(" HTTP/1.0");
-        Serial.println();
-        
-        client.print("GET /~access/access?device=laser&id=");   
-        client.print(reader1, HEX);
-        client.println(" HTTP/1.0");
-        client.println();
-
-        // reset values coming from http
-        httpresponse = "";
-        username = "";
-        authorized = false;
-     }
-     else 
-     {
-        // kf you didn't get a connection to the server:
-        Serial.println("connection failed");
-     }
-     
-     wiegand26.initReaderOne();                     // Reset for next tag scan  
-     
-  }
-
-  
-  while (client.available()) {
-    char thisChar = client.read();
-    // only fill up httpresponse with data after a ^ sign.
-    if (httpresponse.charAt(0) == '^' || thisChar == '^') {
-      httpresponse += thisChar;
-    }
-  }
-  
-  if(!client.available() && httpresponse.length()>0) { 
-    Serial.println("Response: ");
-    
-    Serial.println(httpresponse);
-    int c = httpresponse.indexOf('^');
-    int d = httpresponse.indexOf('|'); 
-    int e = httpresponse.indexOf('$');
-    
-    Serial.print("IndexOf:");
-    Serial.println(c);
-    Serial.println(d);
-    Serial.println(e);
-    
-    Serial.println("SubStr:");
-    Serial.println(httpresponse.substring(c+1,d));
-
-    username = httpresponse.substring(c+1,d);
-    
-    Serial.print("User: ");
-    Serial.println(username);
-    
-    Serial.println("SubStr:");
-    Serial.println(httpresponse.substring(d+1,e));
-    
-    if(httpresponse.substring(d+1,e) == "OK") {
-      authorized = true; 
-    }
-    
-    Serial.print("Auth: ");
-    Serial.println(authorized);
-    
-    
-    Serial.println("End Response");
-    httpresponse = "";
-  }
-  
-  // if the server's disconnected, stop the client:
-  if (!client.connected()) {
-    client.stop();
-  }
-  
   //////////////////////////
   // Normal operation section
   //////////////////////////  
@@ -228,6 +143,15 @@ void loop()                                     // Main branch, runs over and ov
   // check timer -- if expired, remove authorization
   
   if(authorized && relay1high) {
+    
+    // Detect button push
+    lcd.setCursor(12,0);
+    lcd.print(analogRead(A5));
+    lcd.print("  ");
+    if (analogRead(A5) < 50) {  
+      relay1timer = millis(); 
+    }
+    
     // calculate current time elapsed
     long currentTime = millis() - relay1timer;
     // if time entirely elapsed, deauthorize.
@@ -250,7 +174,7 @@ void loop()                                     // Main branch, runs over and ov
     lcd.print(minRemaining);
     lcd.print(":");
     lcd.print(secRemaining);
-    lcd.print(" remain");
+    lcd.print(" remain    ");
   }
   if(!authorized && relay1high) {
     lcd.clear();
@@ -276,9 +200,105 @@ void loop()                                     // Main branch, runs over and ov
     // display login message
     lcd.setCursor(0, 0);  
     lcd.print("Please login.");
+      
+    //////////////////////////  
+    // Reader input/authentication section  
+    //////////////////////////
+    if(reader1Count >= 26)
+    {                           //  When tag presented to reader1 (No keypad on this reader)
+  
+       lcd.clear();
+       lcd.print("connecting...");
+       delay(150);
+       lcd.clear();
+       
+       Serial.println("connecting...");
+    
+       // if you get a connection, report back via serial:
+       if (client.connect())
+       {
+          Serial.println("connected");
+          
+          Serial.print("GET /~access/access?device=laser&id=");   
+          Serial.print(reader1, HEX);
+          Serial.println(" HTTP/1.0");
+          Serial.println();
+          
+          client.print("GET /~access/access?device=laser&id=");   
+          client.print(reader1, HEX);
+          client.println(" HTTP/1.0");
+          client.println();
+  
+          // reset values coming from http
+          httpresponse = "";
+          username = "";
+          authorized = false;
+       }
+       else 
+       {
+          // kf you didn't get a connection to the server:
+          Serial.println("connection failed");
+       }
+       
+       wiegand26.initReaderOne();                     // Reset for next tag scan  
+       
+    }
+  
+    
+    while (client.available()) {
+      char thisChar = client.read();
+      // only fill up httpresponse with data after a ^ sign.
+      if (httpresponse.charAt(0) == '^' || thisChar == '^') {
+        httpresponse += thisChar;
+      }
+    }
+    
+    if(!client.available() && httpresponse.length()>0) { 
+      Serial.println("Response: ");
+      
+      Serial.println(httpresponse);
+      int c = httpresponse.indexOf('^');
+      int d = httpresponse.indexOf('|'); 
+      int e = httpresponse.indexOf('$');
+      
+      Serial.print("IndexOf:");
+      Serial.println(c);
+      Serial.println(d);
+      Serial.println(e);
+      
+      Serial.println("SubStr:");
+      Serial.println(httpresponse.substring(c+1,d));
+  
+      username = httpresponse.substring(c+1,d);
+      
+      Serial.print("User: ");
+      Serial.println(username);
+      
+      Serial.println("SubStr:");
+      Serial.println(httpresponse.substring(d+1,e));
+      
+      if(httpresponse.substring(d+1,e) == "OK") {
+        authorized = true; 
+      }
+      
+      Serial.print("Auth: ");
+      Serial.println(authorized);
+      
+      
+      Serial.println("End Response");
+      httpresponse = "";
+    }
+    
+    // if the server's disconnected, stop the client:
+    if (!client.connected()) {
+      client.stop();
+    }
+    
   }
   
+  
 } // End of loop()
+
 
 void lcdprint(int x, int y, char text) {
   // set the cursor to column 0, line 1
