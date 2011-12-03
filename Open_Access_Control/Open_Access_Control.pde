@@ -64,6 +64,8 @@ PCATTACH pcattach;    // Software interrupt library
 // pin assignments
 byte reader1Pins[]={2,3};               // Reader 1 pins
 byte RELAYPIN1 = 7;
+byte buzzerPin = 8;
+byte warningLED = 9;
 byte extendButton = A5;
 byte logoutButton = A4;
 
@@ -118,6 +120,12 @@ void setup(){           // Runs once at Arduino boot-up
   digitalWrite(extendButton, HIGH);
   pinMode(logoutButton, INPUT);
   digitalWrite(logoutButton, HIGH);
+  
+  // Initialize led and buzzer
+  pinMode(warningLED, OUTPUT);                                                      
+  digitalWrite(warningLED, LOW);                  
+  pinMode(buzzerPin, OUTPUT);                                                      
+  digitalWrite(buzzerPin, LOW);   
 
   //Initialize output relays
   pinMode(RELAYPIN1, OUTPUT);                                                      
@@ -184,6 +192,57 @@ void loop()                                     // Main branch, runs over and ov
     lcd.print(":");
     lcd.print(secRemaining);
     lcd.print(" remain    ");
+ 
+
+      lcd.print(remaining);
+      
+    if(remaining == 300) {
+      for(int berp=0; berp<3; berp++){
+        tone(buzzerPin, 784, 300); 
+        delay(300);
+        digitalWrite(warningLED, HIGH);
+        tone(buzzerPin, 659, 600); 
+        lcd.setCursor(15, 1);        
+        lcd.print("!");
+        delay(1000);
+        digitalWrite(warningLED, LOW);        
+        lcd.setCursor(15, 1);        
+        lcd.print(" ");
+      }
+    }
+    
+    if(remaining == 60) {
+      for(int berp=0; berp<5; berp++){
+        digitalWrite(warningLED, HIGH);
+        lcd.setCursor(15, 1);        
+        lcd.print("!");
+        tone(buzzerPin, 1047, 100); 
+        delay(130);
+        tone(buzzerPin, 1109, 100); 
+        delay(130);
+        tone(buzzerPin, 1109, 100); 
+        delay(130);
+        tone(buzzerPin, 1109, 100); 
+        digitalWrite(warningLED, LOW);
+        lcd.setCursor(15, 1);        
+        lcd.print(" ");
+        delay(500);
+      }
+    }
+    
+    if(remaining == 15) {
+      for(int berp=0; berp<4; berp++){
+        digitalWrite(warningLED, HIGH);
+        tone(buzzerPin, 1661, 800); 
+        lcd.setCursor(15, 1);        
+        lcd.print("!");
+        delay(800);
+        digitalWrite(warningLED, LOW);
+        lcd.setCursor(15, 1);        
+        lcd.print("!");
+        delay(200);
+      }
+    }
   }
   if(!authorized && relay1high) {
     lcd.clear();
