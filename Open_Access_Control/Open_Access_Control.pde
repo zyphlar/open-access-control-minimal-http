@@ -31,9 +31,7 @@
  * Relay outputs on digital pins 6,7,8,9 //TODO: fix this conflict -WB
  * Reader 1: pins 2,3
  * Ethernet: pins 10,11,12,13 (reserved for the Ethernet shield)
- * LCD: pins 6, 5, 4
- * Buzzer Pin: 8
- * Warning LED: 9
+ * LCD: pins 7, 6, 5, 4, 3, 2
  *
  * Quickstart tips: 
  * Compile and upload the code, then log in via serial console at 57600,8,N,1
@@ -138,6 +136,8 @@ void setup(){           // Runs once at Arduino boot-up
   // start the Ethernet connection:
   Ethernet.begin(mac, ip);
   
+  // set up the LCD's number of rows and columns: 
+  lcd.begin(16, 2);
 
 }
 void loop()                                     // Main branch, runs over and over again
@@ -212,7 +212,7 @@ void loop()                                     // Main branch, runs over and ov
     if(remaining == 60) {
       for(int berp=0; berp<5; berp++){
         digitalWrite(warningLED, HIGH);
-        lcd.setCursor(15, 1);        
+            lcd.setCursor(15, 1);        
         lcd.print("!");
         tone(buzzerPin, 1047, 100); 
         delay(130);
@@ -222,22 +222,16 @@ void loop()                                     // Main branch, runs over and ov
         delay(130);
         tone(buzzerPin, 1109, 100); 
         digitalWrite(warningLED, LOW);
-        lcd.setCursor(15, 1);        
-        lcd.print(" ");
         delay(500);
       }
     }
     
-    if(remaining == 15) {
+    if(remaining == 10) {
       for(int berp=0; berp<4; berp++){
         digitalWrite(warningLED, HIGH);
         tone(buzzerPin, 1661, 800); 
-        lcd.setCursor(15, 1);        
-        lcd.print("!");
         delay(800);
         digitalWrite(warningLED, LOW);
-        lcd.setCursor(15, 1);        
-        lcd.print("!");
         delay(200);
       }
     }
