@@ -31,7 +31,9 @@
  * Relay outputs on digital pins 6,7,8,9 //TODO: fix this conflict -WB
  * Reader 1: pins 2,3
  * Ethernet: pins 10,11,12,13 (reserved for the Ethernet shield)
- * LCD: pins 7, 6, 5, 4, 3, 2
+ * LCD: pins 4, 3, 2
+ * Warning buzzer: 8
+ * Warning led: 9
  *
  * Quickstart tips: 
  * Compile and upload the code, then log in via serial console at 57600,8,N,1
@@ -190,10 +192,7 @@ void loop()                                     // Main branch, runs over and ov
     lcd.print(":");
     lcd.print(secRemaining);
     lcd.print(" remain    ");
- 
-
-      lcd.print(remaining);
-      
+       
     if(remaining == 300) {
       for(int berp=0; berp<3; berp++){
         tone(buzzerPin, 784, 300); 
@@ -212,7 +211,7 @@ void loop()                                     // Main branch, runs over and ov
     if(remaining == 60) {
       for(int berp=0; berp<5; berp++){
         digitalWrite(warningLED, HIGH);
-            lcd.setCursor(15, 1);        
+        lcd.setCursor(15, 1);        
         lcd.print("!");
         tone(buzzerPin, 1047, 100); 
         delay(130);
