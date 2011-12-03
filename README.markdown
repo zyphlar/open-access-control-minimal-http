@@ -24,3 +24,5 @@ Structure
       * keywords.txt
       * WIEGAND26.cpp
       * WIEGAND26.h
+  * hardware folder
+    * open-access-interlock.brd
