@@ -100,6 +100,7 @@ bool authorized = false;
 bool relay1high = false; 
 bool relay2high = false;
 unsigned long relay1timer=0;
+int extendButtonDebounce = 0;
 
 
 void setup(){           // Runs once at Arduino boot-up
@@ -144,20 +145,20 @@ void loop()                                     // Main branch, runs over and ov
   
   if(authorized && relay1high) {
    
-    // Detect button push
-    lcd.setCursor(6,0);
-    lcd.print(analogRead(logoutButton));
-    lcd.print("  ");
+    // Detect logout button push
     if (analogRead(logoutButton) < 50) {  
       authorized = false;
     }
     
-       // Detect extend button push
-    lcd.setCursor(12,0);
-    lcd.print(analogRead(extendButton));
-    lcd.print("  ");
+    // Detect extend button push with debounce/repeat
     if (analogRead(extendButton) < 50) {  
-      relay1timer = millis(); 
+      extendButtonDebounce++;
+    } else {
+      extendButtonDebounce = 0;
+    } 
+    if(extendButtonDebounce > 5){
+      relay1timer += RELAYDELAY; 
+      extendButtonDebounce = -10; 
     }
     
     // calculate current time elapsed
@@ -193,6 +194,7 @@ void loop()                                     // Main branch, runs over and ov
     
     // not authorized -- turn off relay
     relayLow(1);
+    wiegand26.initReaderOne();                     // Reset for next tag scan  
   }
   if(authorized && !relay1high) {
     lcd.clear();
@@ -203,6 +205,7 @@ void loop()                                     // Main branch, runs over and ov
 
     // authorized -- turn on relay
     relayHigh(1);
+    wiegand26.initReaderOne();                     // Reset for next tag scan  
   }
   if(!authorized && !relay1high) {
     // display login message
