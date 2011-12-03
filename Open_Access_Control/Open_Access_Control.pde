@@ -166,7 +166,7 @@ void loop()                                     // Main branch, runs over and ov
     } 
     if(extendButtonDebounce > 5){
       relay1timer += RELAYDELAY; 
-      extendButtonDebounce = -10; 
+      extendButtonDebounce = -15; 
     }
     
     // calculate current time elapsed
@@ -225,7 +225,7 @@ void loop()                                     // Main branch, runs over and ov
       }
     }
     
-    if(remaining == 10) {
+    if(remaining == 15) {
       for(int berp=0; berp<4; berp++){
         digitalWrite(warningLED, HIGH);
         tone(buzzerPin, 1661, 800); 
