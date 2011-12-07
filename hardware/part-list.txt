@@ -1,0 +1,25 @@
+Partlist
+
+Part      Value                 Device                Package               Library  Sheet
+
+ARDUINO
+Shield Headers                  Headers               1x6
+Shield Headers                  Headers               1x6
+Shield Headers                  Headers               1x8
+Shield Headers                  Headers               1x8
+SHIFT     74HC595N              Shift Reg             DIL16                 74xx-eu  1
+BUZZ      CEM-1203(42)          Buzzer                6.5mm                 SparkFun 1
+EXTEND    B3F-1060              Button                TACTILE-PTH           SparkFun 1
+LOGOUT    B3F-1060              Button                TACTILE-PTH           SparkFun 1
+LCD       2x7                   Header                MA07-2                con-lstb 1
+LCD_PWR   1x5                   Header                1X05                  SparkFun 1
+R1        220ohm                Resistor              AXIAL-0.3             SparkFun 1
+R2        220ohm                Resistor              AXIAL-0.3             SparkFun 1
+R3        220ohm                Resistor              AXIAL-0.3             SparkFun 1
+R4        10Kohm                Trim Pot              B25P                  pot      1
+RDR_DATA  SCREW                 Screw Term            SCREWTERMINAL-3.5MM-2 SparkFun 1
+RDR_PWR   SCREW                 Screw Term            SCREWTERMINAL-3.5MM-2 SparkFun 1
+RELAY     SCREW                 Screw Term            SCREWTERMINAL-3.5MM-2 SparkFun 1
+RELAY_LED GRN                   LED 5MM               LED5MM                led      1
+WARN_LED  RED                   LED 5MM               LED5MM                led      1
+
