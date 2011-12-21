@@ -1,0 +1,112 @@
+Pinlist
+
+Exported from open-access-interlock.brd at 12/7/11 2:34 AM
+
+EAGLE Version 5.11.0 Copyright (c) 1988-2010 CadSoft
+
+Part     Pad      Net
+
+ARDUINO  3.3V              *** unconnected ***
+         5V       VCC
+         A0                *** unconnected ***
+         A1                *** unconnected ***
+         A2                *** unconnected ***
+         A3                *** unconnected ***
+         A4       N$14
+         A5       N$15
+         AREF              *** unconnected ***
+         D10               *** unconnected ***
+         D11               *** unconnected ***
+         D12               *** unconnected ***
+         D13               *** unconnected ***
+         D2       N$1
+         D3       N$2
+         D4       N$5
+         D5       N$7
+         D6       N$6
+         D7       N$8
+         D8       N$10
+         D9       N$9
+         GND@0    GND
+         GND@1             *** unconnected ***
+         GND@2             *** unconnected ***
+         RES               *** unconnected ***
+         RX                *** unconnected ***
+         TX                *** unconnected ***
+         VIN               *** unconnected ***
+
+CONTRAST A        VCC
+         E        GND
+         S        N$18
+
+EXTEND   1                 *** unconnected ***
+         2        GND
+         3                 *** unconnected ***
+         4        N$15
+
+LCD      1        GND
+         10                *** unconnected ***
+         11       N$12
+         12       N$4
+         13       N$3
+         14       N$20
+         15       VCC
+         16       N$19
+         2        VCC
+         3        N$18
+         4        N$17
+         5        GND
+         6                 *** unconnected ***
+         7                 *** unconnected ***
+         8                 *** unconnected ***
+         9                 *** unconnected ***
+
+LOGOUT   1                 *** unconnected ***
+         2        GND
+         3                 *** unconnected ***
+         4        N$14
+
+R1       P$1      N$19
+         P$2      GND
+
+R2       P$1      GND
+         P$2      N$23
+
+R3       P$1      GND
+         P$2      N$22
+
+RDR_DATA 1        N$1
+         2        N$2
+
+RDR_PWR  1        VCC
+         2        GND
+
+RELAY    1        N$8
+         2        GND
+
+RELAY_LED A        N$8
+         K        N$23
+
+SHIFT    1        N$3
+         10       VCC
+         11       N$7
+         12       N$6
+         13       GND
+         14       N$5
+         15       N$20
+         16       VCC
+         2        N$4
+         3        N$12
+         4                 *** unconnected ***
+         5                 *** unconnected ***
+         6        N$16
+         7        N$17
+         8        GND
+         9                 *** unconnected ***
+
+SPKR     P$1      N$10
+         P$2      GND
+
+WARN_LED A        N$9
+         K        N$22
+
