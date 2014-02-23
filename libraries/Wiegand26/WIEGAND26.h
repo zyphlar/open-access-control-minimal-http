@@ -2,7 +2,7 @@
 #define	_WIEGAND26_H_ 
 #endif
 
-#include <WProgram.h>
+#include <Arduino.h>
 
 class WIEGAND26 {
 public:

@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
-#include "WProgram.h"
+#include "Arduino.h"
 
 /**
  * This is a modified version of the standard LiquidCrystal class that
@@ -249,8 +249,9 @@ inline void ShiftLCD::command(uint8_t value) {
   send(value, false);
 }
 
-inline void ShiftLCD::write(uint8_t value) {
+inline size_t ShiftLCD::write(uint8_t value) {
   send(value, true);
+  return 1;
 }
 
 /************ low level data pushing commands **********/

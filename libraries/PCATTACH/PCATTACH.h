@@ -2,8 +2,7 @@
 #define	_PCATTACH_H_ 
 #endif
 
-#include <WProgram.h>
-#define uint_8 byte
+#include <Arduino.h>
 
 class PCATTACH {
 
@@ -13,8 +12,8 @@ PCATTACH();
 
 
 
-void PCattachInterrupt(byte pin, void (*userFunc)(void), int mode);
-void PCdetachInterrupt(byte pin);
+void PCattachInterrupt(uint8_t pin, void (*userFunc)(void), int mode);
+void PCdetachInterrupt(uint8_t pin);
 
 
 static void PCint(uint8_t);
