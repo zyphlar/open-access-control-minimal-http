@@ -1,5 +1,7 @@
 Open Access Control - HTTP Minimal Edition
 ======================================
+AKA Open Access Control Interlock
+---------------------------------
 
 This is a stripped-down version of the 23b hackerspace's Open Access Control system, intended for embedded use with an RFID reader and Ethernet shield for authenticating Wiegand RFID cards with a webservice. Please see http://code.google.com/p/open-access-control/ for the main/full version.
 
