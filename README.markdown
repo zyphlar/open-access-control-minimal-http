@@ -11,7 +11,7 @@ Structure
 * This folder
   * Open Access Control folder
     * Open Access Control.pde (Arduino code -- open from the Arduino IDE.)
-  * libraries folder (copy the contents of this folder to your Arduino program's libraries folder.)
+  * libraries folder (copy the contents of this folder to your Arduino program's libraries folder and restart the Arduino program.)
     * ShiftLCD folder
       * keywords.txt
       * ShiftLCD.cpp
