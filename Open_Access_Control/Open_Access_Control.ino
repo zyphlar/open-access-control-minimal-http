@@ -1,8 +1,9 @@
 /*
  * Open Source RFID Access Controller - MINIMAL HTTP EDITION
+ * AKA RFID Interlock
  *
- * 11/27/2011 v0.01
- * Last build test with Arduino v00.22
+ * 02/23/2014 v0.1
+ * Last build test with Arduino v1.00
  * 
  * Based on Open Source RFID Access Controller code by:
  * Arclight - arclight@23.org
@@ -28,12 +29,14 @@
  * input device.
  * Outputs go to relays for door hardware/etc control.
  *
- * Relay outputs on digital pins 7,8,9 //TODO: fix this conflict -WB
- * Reader 1: pins 2,3
+ * Relay output on digital pin 7
+ * RFID Reader: pins 2,3
  * Ethernet: pins 10,11,12,13 (reserved for the Ethernet shield)
- * LCD: pins 4, 5, 
+ * LCD: pins 4, 5, 6
  * Warning buzzer: 8
- * Warning led: 9
+ * Warning LED: 9
+ * Extend button: A5
+ * Logout button: A4
  *
  * Quickstart tips: 
  * Compile and upload the code, then log in via serial console at 57600,8,N,1
