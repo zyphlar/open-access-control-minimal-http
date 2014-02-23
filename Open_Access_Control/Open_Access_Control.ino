@@ -28,10 +28,10 @@
  * input device.
  * Outputs go to relays for door hardware/etc control.
  *
- * Relay outputs on digital pins 6,7,8,9 //TODO: fix this conflict -WB
+ * Relay outputs on digital pins 7,8,9 //TODO: fix this conflict -WB
  * Reader 1: pins 2,3
  * Ethernet: pins 10,11,12,13 (reserved for the Ethernet shield)
- * LCD: pins 4, 3, 2
+ * LCD: pins 4, 5, 
  * Warning buzzer: 8
  * Warning led: 9
  *
@@ -39,11 +39,26 @@
  * Compile and upload the code, then log in via serial console at 57600,8,N,1
  *
  */
+ 
 
 /////////////////
+// BEGIN USER CONFIGURATION SECTION
+/////////////////
+
+// Enter a MAC address, server address, and device identifier for your controller below.
+// The IP address will be automatically assigned via DHCP.
+char* device = "laser";                       // device identifier (aka "certification slug")
+char* server = "members.heatsynclabs.org";    // authorization server (typically Open Access Control Web Interface)
+char* user = "YOUREMAILORUSERNAME";        // username to login to server
+char* pass = "YOURPASSWORD";                        // password to login to server
+byte mac[] = {  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xAD };
+
+/////////////////
+// END USER CONFIGURATION SECTION
+/////////////////
+
+
 // Includes
-/////////////////
-
 #include <EEPROM.h>       // Needed for saving to non-voilatile memory on the Arduino.
 
 #include <Ethernet.h>
@@ -59,10 +74,6 @@
 WIEGAND26 wiegand26;  // Wiegand26 (RFID reader serial protocol) library
 PCATTACH pcattach;    // Software interrupt library
 
-/////////////////
-// Global variables
-/////////////////
-
 // pin assignments
 byte reader1Pins[]={2,3};               // Reader 1 pins
 byte RELAYPIN1 = 7;
@@ -72,7 +83,7 @@ byte extendButton = A5;
 byte logoutButton = A4;
 
 // initialize the ShiftLCD library with the numbers of the interface pins
-ShiftLCD lcd(4, 6, 5);
+ShiftLCD lcd(4, 5, 6);
 
 // statics
 #define RELAYDELAY 1800000                  // How long to open door lock once access is granted. (1000 = 1sec)
@@ -82,16 +93,8 @@ char inString[40]={0};                                         // Size of comman
 byte inCount=0;
 boolean privmodeEnabled = false;                               // Switch for enabling "priveleged" commands
 
-// Enter a MAC address and IP address for your controller below.
-// The IP address will be dependent on your local network:
-byte mac[] = {  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-byte ip[] = { 10,1,1,2 };
-byte server[] = { 10,1,1,1 }; // hsl-access
-
 // Initialize the Ethernet client library
-// with the IP address and port of the server 
-// that you want to connect to (port 80 is default for HTTP):
-Client client(server, 80);
+EthernetClient client;
 
 // strings for storing results from web server
 String httpresponse = "";
@@ -135,11 +138,31 @@ void setup(){           // Runs once at Arduino boot-up
 
   Serial.begin(57600);	               	       // Set up Serial output at 8,N,1,57600bps
   
-  // start the Ethernet connection:
-  Ethernet.begin(mac, ip);
-  
   // set up the LCD's number of rows and columns: 
   lcd.begin(16, 2);
+  lcdprint(0,0,"Starting...");
+  
+  // start the Ethernet connection:
+  if (Ethernet.begin(mac) == 0) {
+    lcd.clear();
+    lcdprint(0,0,"FAIL: No Network");
+    lcdprint(0,1,"Chk DHCP, Reboot");
+    // no point in carrying on, so do nothing forevermore:
+    for(;;)
+      ;
+  }
+  else {
+    lcd.clear();
+    lcdprint(0,0,"Found IP:");
+    
+    Serial.println(Ethernet.localIP());
+    lcd.setCursor(0, 1);
+    lcd.print(Ethernet.localIP());
+  }
+  // give the Ethernet shield a second to initialize:
+  delay(1000);
+  
+  lcd.clear();
 
 }
 void loop()                                     // Main branch, runs over and over again
@@ -155,6 +178,7 @@ void loop()                                     // Main branch, runs over and ov
    
     // Detect logout button push
     if (analogRead(logoutButton) < 50) {  
+      Serial.println("logout");
       authorized = false;
     }
     
@@ -165,6 +189,7 @@ void loop()                                     // Main branch, runs over and ov
       extendButtonDebounce = 0;
     } 
     if(extendButtonDebounce > 5){
+      Serial.println("extend");
       relay1timer += RELAYDELAY; 
       extendButtonDebounce = -15; 
     }
@@ -237,8 +262,7 @@ void loop()                                     // Main branch, runs over and ov
   }
   if(!authorized && relay1high) {
     lcd.clear();
-    lcd.setCursor(0, 0);  
-    lcd.print("Turning off.");
+    lcdprint(0,0,"Turning off.");
     delay(500);    
     lcd.clear();    
     
@@ -248,8 +272,7 @@ void loop()                                     // Main branch, runs over and ov
   }
   if(authorized && !relay1high) {
     lcd.clear();
-    lcd.setCursor(0, 0);  
-    lcd.print("Turning on.");
+    lcdprint(0,0,"Turning on.");
     delay(500);
     lcd.clear();
 
@@ -259,7 +282,7 @@ void loop()                                     // Main branch, runs over and ov
   }
   if(!authorized && !relay1high) {
     // display login message
-    lcd.setCursor(0, 0);  
+    lcd.setCursor(0,0);
     lcd.print("Please login.");
       
     //////////////////////////  
@@ -267,38 +290,57 @@ void loop()                                     // Main branch, runs over and ov
     //////////////////////////
     if(reader1Count >= 26)
     {                           //  When tag presented to reader1 (No keypad on this reader)
-  
-       lcd.clear();
-       lcd.print("connecting...");
-       delay(150);
-       lcd.clear();
        
-       Serial.println("connecting...");
+       Serial.print("Reader 1: ");
+       Serial.println(reader1, HEX);
+       lcdprint(0,0,"connecting...");
+       delay(150);
     
        // if you get a connection, report back via serial:
-       if (client.connect())
+       if (client.connect(server, 80))
        {
-          Serial.println("connected");
+         lcd.clear();
+         lcdprint(0,0,"connected");
+         
+         Serial.print("GET /cards/authorize/");   
+         Serial.print(reader1, HEX);
+         Serial.print("?device=");
+         Serial.print(device);
+         Serial.print("&user=");
+         Serial.print(user);
+         Serial.print("&pass=");
+         Serial.print(pass);
+         Serial.println(" HTTP/1.0");
+         Serial.print("Host: ");
+         Serial.println(server);
+         Serial.println();
           
-          Serial.print("GET /~access/access?device=laser&id=");   
-          Serial.print(reader1, HEX);
-          Serial.println(" HTTP/1.0");
-          Serial.println();
-          
-          client.print("GET /~access/access?device=laser&id=");   
-          client.print(reader1, HEX);
-          client.println(" HTTP/1.0");
-          client.println();
+         client.print("GET /cards/authorize/");   
+         client.print(reader1, HEX);
+         client.print("?device=");
+         client.print(device);
+         client.print("&user=");
+         client.print(user);
+         client.print("&pass=");
+         client.print(pass);
+         client.println(" HTTP/1.0");
+         client.print("Host: ");
+         client.println(server);
+         client.println();
   
-          // reset values coming from http
-          httpresponse = "";
-          username = "";
-          authorized = false;
+         // reset values coming from http
+         httpresponse = "";
+         username = "";
+         authorized = false;
        }
        else 
        {
-          // kf you didn't get a connection to the server:
-          Serial.println("connection failed");
+         // if you didn't get a connection to the server:
+         Serial.println("connection failed");
+         lcd.clear();
+         lcdprint(0,0,"connection failed");
+         delay(500);
+         lcd.clear();
        }
        
        wiegand26.initReaderOne();                     // Reset for next tag scan  
@@ -308,8 +350,10 @@ void loop()                                     // Main branch, runs over and ov
     
     while (client.available()) {
       char thisChar = client.read();
-      // only fill up httpresponse with data after a ^ sign.
-      if (httpresponse.charAt(0) == '^' || thisChar == '^') {
+      Serial.print(thisChar);
+      // only fill up httpresponse with data after a [ sign.
+      // limit total text to 50 to prevent buffer issues
+      if ((httpresponse.charAt(0) == '[' || thisChar == '[')  && httpresponse.length() < 50) { 
         httpresponse += thisChar;
       }
     }
@@ -318,36 +362,51 @@ void loop()                                     // Main branch, runs over and ov
       Serial.println("Response: ");
       
       Serial.println(httpresponse);
-      int c = httpresponse.indexOf('^');
-      int d = httpresponse.indexOf('|'); 
-      int e = httpresponse.indexOf('$');
+      int c = httpresponse.indexOf('[');
+      int d = httpresponse.indexOf(',');
+      int e = httpresponse.indexOf(']');
       
       Serial.print("IndexOf:");
       Serial.println(c);
       Serial.println(d);
       Serial.println(e);
       
-      Serial.println("SubStr:");
+      Serial.println("AuthSubStr:");
       Serial.println(httpresponse.substring(c+1,d));
-  
-      username = httpresponse.substring(c+1,d);
       
-      Serial.print("User: ");
-      Serial.println(username);
-      
-      Serial.println("SubStr:");
-      Serial.println(httpresponse.substring(d+1,e));
-      
-      if(httpresponse.substring(d+1,e) == "OK") {
+      if(httpresponse.substring(c+1,d) == "true") {
         authorized = true; 
+      }
+      else {
+        Serial.println(httpresponse.substring(c+1,d));
       }
       
       Serial.print("Auth: ");
       Serial.println(authorized);
       
       
+      Serial.println("UserSubStr:");
+      Serial.println(httpresponse.substring(d+1,e));
+  
+      String username_raw = httpresponse.substring(d+1,e);
+      username_raw.replace("\"", "");
+      Serial.print("UserTrimmed: ");
+      Serial.println(username_raw);
+  
+      username = username_raw;
+      
+      Serial.print("User: ");
+      Serial.println(username);
+      
+      
       Serial.println("End Response");
       httpresponse = "";
+      
+      if(!authorized) {
+        lcd.clear();
+        lcdprint(0,0,"Not authorized.");
+        delay(500);
+      }
     }
     
     // if the server's disconnected, stop the client:
@@ -361,7 +420,8 @@ void loop()                                     // Main branch, runs over and ov
 } // End of loop()
 
 
-void lcdprint(int x, int y, char text) {
+void lcdprint(int x, int y, char* text) {
+  Serial.println(text);
   // set the cursor to column 0, line 1
   // (note: line 1 is the second row, since counting begins with 0):
   lcd.setCursor(x, y);
