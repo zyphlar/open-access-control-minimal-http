@@ -6174,7 +6174,7 @@ Source: http://onsemi.com</description>
 <part name="CONTRAST" library="pot" deviceset="TRIM_US-" device="RS3" value="10K"/>
 <part name="R2" library="SparkFun" deviceset="RESISTOR" device="AXIAL-0.3" value="220"/>
 <part name="LCD" library="adafruit" deviceset="HD44780LCD" device="-1602"/>
-<part name="SPKR" library="adafruit" deviceset="SPEAKER" device="/PS12"/>
+<part name="SPKR" library="adafruit" deviceset="SPEAKER" device="/PS12" value=""/>
 <part name="R4" library="SparkFun" deviceset="RESISTOR" device="AXIAL-0.3" value="650"/>
 <part name="R5" library="SparkFun" deviceset="RESISTOR" device="AXIAL-0.3" value="6.5K"/>
 <part name="R6" library="SparkFun" deviceset="RESISTOR" device="AXIAL-0.3" value="4.7K"/>
@@ -6195,7 +6195,7 @@ Source: http://onsemi.com</description>
 <part name="P+7" library="SparkFun" deviceset="VCC" device=""/>
 <part name="P+8" library="SparkFun" deviceset="VCC" device=""/>
 <part name="READER" library="SparkFun-Connectors" deviceset="M04" device="SCREW"/>
-<part name="T1" library="transistor" deviceset="TIP31" device=""/>
+<part name="TIP31" library="transistor" deviceset="TIP31" device=""/>
 <part name="P-1" library="supply1" deviceset="V-" device=""/>
 <part name="GND11" library="SparkFun" deviceset="GND" device=""/>
 <part name="P+1" library="SparkFun" deviceset="VCC" device=""/>
@@ -6204,11 +6204,42 @@ Source: http://onsemi.com</description>
 <part name="GND13" library="SparkFun" deviceset="GND" device=""/>
 <part name="P+10" library="supply1" deviceset="V+" device=""/>
 <part name="P-2" library="supply1" deviceset="V-" device=""/>
-<part name="JP1" library="SparkFun-Connectors" deviceset="M04" device="SCREW"/>
+<part name="RELAY" library="SparkFun-Connectors" deviceset="M04" device="SCREW"/>
+<part name="GND14" library="SparkFun" deviceset="GND" device=""/>
+<part name="GND15" library="SparkFun" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
 <plain>
+<text x="154.94" y="38.1" size="0.6096" layer="97" align="top-left">"Relay_Signal" is the ground
+side of the relay coil. When the
+transistor turns on, it lets current
+flow through the relay using low-side
+switching.
+
+The TIP31 NPN transistor appears to
+support up to 40 volts in this
+configuration.
+
+The Arduino will supply slightly 
+less than 5V which is above the 
+0.7V saturation voltage for this 
+chip. This arrangement will then 
+let that flow through the transistor 
+(B-to-E?) to the V- external ground.
+
+The transistor will then allow the 
+V+ current to flow through to V-, 
+allowing current to flow through the
+relay coil, powering it and actuating 
+the relay.
+
+By having the transistor switch the 
+ground of the relay power instead of 
+the positive side, we avoid having 
+to saturate the transistor at higher 
+voltages or worry about supplying it 
+somehow.</text>
 </plain>
 <instances>
 <instance part="ARDUINO" gate="G$1" x="58.42" y="38.1"/>
@@ -6244,37 +6275,46 @@ Source: http://onsemi.com</description>
 <instance part="P+7" gate="1" x="12.7" y="11.43"/>
 <instance part="P+8" gate="1" x="40.64" y="33.02"/>
 <instance part="READER" gate="G$1" x="106.68" y="53.34" rot="R180"/>
-<instance part="T1" gate="G$1" x="142.24" y="35.56" smashed="yes">
+<instance part="TIP31" gate="G$1" x="142.24" y="35.56" smashed="yes">
 <attribute name="NAME" x="144.78" y="35.56" size="1.778" layer="95"/>
 <attribute name="VALUE" x="144.78" y="33.02" size="1.778" layer="96"/>
 </instance>
-<instance part="P-1" gate="1" x="144.78" y="25.4"/>
+<instance part="P-1" gate="1" x="144.78" y="25.4" smashed="yes">
+<attribute name="VALUE" x="140.97" y="27.94" size="1.778" layer="96" rot="R270"/>
+</instance>
 <instance part="GND11" gate="1" x="15.24" y="46.99"/>
 <instance part="P+1" gate="1" x="33.02" y="60.96"/>
 <instance part="P+9" gate="1" x="33.02" y="43.18"/>
 <instance part="GND12" gate="1" x="83.82" y="-2.54"/>
 <instance part="GND13" gate="1" x="109.22" y="-2.54"/>
-<instance part="P+10" gate="1" x="91.44" y="73.66"/>
-<instance part="P-2" gate="1" x="91.44" y="63.5"/>
-<instance part="JP1" gate="G$1" x="106.68" y="71.12" rot="R180"/>
+<instance part="P+10" gate="1" x="121.92" y="55.88"/>
+<instance part="P-2" gate="1" x="121.92" y="45.72" smashed="yes">
+<attribute name="VALUE" x="118.11" y="48.26" size="1.778" layer="96" rot="R270"/>
+</instance>
+<instance part="RELAY" gate="G$1" x="137.16" y="53.34" smashed="yes" rot="R180">
+<attribute name="VALUE" x="142.24" y="60.96" size="1.778" layer="96" rot="R180"/>
+<attribute name="NAME" x="142.24" y="44.958" size="1.778" layer="95" rot="R180"/>
+</instance>
+<instance part="GND14" gate="1" x="40.64" y="20.32"/>
+<instance part="GND15" gate="1" x="38.1" y="22.86"/>
 </instances>
 <busses>
 </busses>
 <nets>
 <net name="N$1" class="0">
 <segment>
-<wire x1="71.12" y1="48.26" x2="95.25" y2="48.26" width="0.1524" layer="91"/>
+<wire x1="71.12" y1="48.26" x2="96.52" y2="48.26" width="0.1524" layer="91"/>
 <pinref part="ARDUINO" gate="G$1" pin="D2"/>
-<wire x1="95.25" y1="48.26" x2="97.79" y2="50.8" width="0.1524" layer="91"/>
+<wire x1="96.52" y1="48.26" x2="99.06" y2="50.8" width="0.1524" layer="91"/>
 <pinref part="READER" gate="G$1" pin="3"/>
-<wire x1="97.79" y1="50.8" x2="101.6" y2="50.8" width="0.1524" layer="91"/>
+<wire x1="99.06" y1="50.8" x2="101.6" y2="50.8" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$2" class="0">
 <segment>
-<wire x1="71.12" y1="45.72" x2="97.79" y2="45.72" width="0.1524" layer="91"/>
+<wire x1="71.12" y1="45.72" x2="99.06" y2="45.72" width="0.1524" layer="91"/>
 <pinref part="ARDUINO" gate="G$1" pin="*D3"/>
-<wire x1="97.79" y1="45.72" x2="101.6" y2="48.26" width="0.1524" layer="91"/>
+<wire x1="99.06" y1="45.72" x2="101.6" y2="48.26" width="0.1524" layer="91"/>
 <pinref part="READER" gate="G$1" pin="4"/>
 </segment>
 </net>
@@ -6482,6 +6522,16 @@ Source: http://onsemi.com</description>
 <pinref part="GND12" gate="1" pin="GND"/>
 <wire x1="83.82" y1="2.54" x2="83.82" y2="0" width="0.1524" layer="91"/>
 </segment>
+<segment>
+<pinref part="ARDUINO" gate="G$1" pin="GND@1"/>
+<pinref part="GND14" gate="1" pin="GND"/>
+<wire x1="40.64" y1="22.86" x2="45.72" y2="22.86" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="ARDUINO" gate="G$1" pin="GND@2"/>
+<pinref part="GND15" gate="1" pin="GND"/>
+<wire x1="38.1" y1="25.4" x2="45.72" y2="25.4" width="0.1524" layer="91"/>
+</segment>
 </net>
 <net name="N$8" class="0">
 <segment>
@@ -6542,29 +6592,29 @@ Source: http://onsemi.com</description>
 <junction x="128.27" y="35.56"/>
 <pinref part="R4" gate="G$1" pin="2"/>
 <pinref part="R5" gate="G$1" pin="1"/>
-<pinref part="T1" gate="G$1" pin="B"/>
+<pinref part="TIP31" gate="G$1" pin="B"/>
 <junction x="139.7" y="35.56"/>
 </segment>
 </net>
 <net name="V-" class="0">
 <segment>
 <pinref part="P-1" gate="1" pin="V-"/>
-<pinref part="T1" gate="G$1" pin="E"/>
+<pinref part="TIP31" gate="G$1" pin="E"/>
 <wire x1="144.78" y1="27.94" x2="144.78" y2="30.48" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="P-2" gate="1" pin="V-"/>
-<wire x1="91.44" y1="66.04" x2="101.6" y2="66.04" width="0.1524" layer="91"/>
-<pinref part="JP1" gate="G$1" pin="4"/>
+<wire x1="121.92" y1="48.26" x2="132.08" y2="48.26" width="0.1524" layer="91"/>
+<pinref part="RELAY" gate="G$1" pin="4"/>
 </segment>
 </net>
 <net name="N$14" class="0">
 <segment>
 <pinref part="ARDUINO" gate="G$1" pin="A4"/>
-<wire x1="45.72" y1="45.72" x2="44.45" y2="45.72" width="0.1524" layer="91"/>
-<wire x1="44.45" y1="45.72" x2="40.64" y2="49.53" width="0.1524" layer="91"/>
+<wire x1="45.72" y1="45.72" x2="41.91" y2="45.72" width="0.1524" layer="91"/>
+<wire x1="41.91" y1="45.72" x2="38.1" y2="49.53" width="0.1524" layer="91"/>
 <pinref part="R6" gate="G$1" pin="2"/>
-<wire x1="40.64" y1="49.53" x2="33.02" y2="49.53" width="0.1524" layer="91"/>
+<wire x1="38.1" y1="49.53" x2="33.02" y2="49.53" width="0.1524" layer="91"/>
 <pinref part="LOGOUT" gate="S" pin="4"/>
 <wire x1="33.02" y1="49.53" x2="27.94" y2="49.53" width="0.1524" layer="91"/>
 <junction x="33.02" y="49.53"/>
@@ -6586,24 +6636,24 @@ Source: http://onsemi.com</description>
 </net>
 <net name="V+" class="0">
 <segment>
-<pinref part="JP1" gate="G$1" pin="3"/>
+<pinref part="RELAY" gate="G$1" pin="3"/>
 <pinref part="P+10" gate="1" pin="V+"/>
-<wire x1="101.6" y1="68.58" x2="91.44" y2="68.58" width="0.1524" layer="91"/>
-<wire x1="91.44" y1="68.58" x2="91.44" y2="71.12" width="0.1524" layer="91"/>
-<pinref part="JP1" gate="G$1" pin="2"/>
-<wire x1="91.44" y1="71.12" x2="101.6" y2="71.12" width="0.1524" layer="91"/>
-<junction x="91.44" y="71.12"/>
+<wire x1="132.08" y1="50.8" x2="121.92" y2="50.8" width="0.1524" layer="91"/>
+<wire x1="121.92" y1="50.8" x2="121.92" y2="53.34" width="0.1524" layer="91"/>
+<pinref part="RELAY" gate="G$1" pin="2"/>
+<wire x1="121.92" y1="53.34" x2="132.08" y2="53.34" width="0.1524" layer="91"/>
+<junction x="121.92" y="53.34"/>
 </segment>
 </net>
 <net name="RELAY_SIGNAL" class="0">
 <segment>
-<pinref part="JP1" gate="G$1" pin="1"/>
-<wire x1="101.6" y1="73.66" x2="93.98" y2="73.66" width="0.1524" layer="91"/>
-<label x="93.98" y="73.66" size="1.016" layer="95"/>
+<pinref part="RELAY" gate="G$1" pin="1"/>
+<wire x1="132.08" y1="55.88" x2="124.46" y2="55.88" width="0.1524" layer="91"/>
+<label x="124.46" y="55.88" size="1.016" layer="95"/>
 </segment>
 <segment>
 <wire x1="144.78" y1="40.64" x2="144.78" y2="43.18" width="0.1524" layer="91"/>
-<pinref part="T1" gate="G$1" pin="C"/>
+<pinref part="TIP31" gate="G$1" pin="C"/>
 <label x="144.78" y="43.18" size="1.016" layer="95"/>
 <wire x1="144.78" y1="43.18" x2="154.94" y2="43.18" width="0.1524" layer="91"/>
 </segment>
@@ -6612,11 +6662,17 @@ Source: http://onsemi.com</description>
 </sheet>
 </sheets>
 <errors>
-<approved hash="102,1,-20.32,-40.64,VDD,VCC,,,,"/>
-<approved hash="102,1,-22.86,-40.64,VSS,GND,,,,"/>
-<approved hash="113,1,154.347,15.0453,RELAY,,,,,"/>
-<approved hash="113,1,103.547,55.6853,READER,,,,,"/>
+<approved hash="102,1,-20.32,7.62,VDD,VCC,,,,"/>
+<approved hash="102,1,-22.86,7.62,VSS,GND,,,,"/>
+<approved hash="113,1,104.817,50.6053,READER,,,,,"/>
+<approved hash="113,1,135.297,50.6053,RELAY,,,,,"/>
 </errors>
 </schematic>
 </drawing>
+<compatibility>
+<note version="6.3" minversion="6.2.2" severity="warning">
+Since Version 6.2.2 text objects can contain more than one line,
+which will not be processed correctly with this version.
+</note>
+</compatibility>
 </eagle>
